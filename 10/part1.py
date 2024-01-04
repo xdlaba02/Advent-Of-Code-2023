@@ -26,9 +26,9 @@ def connected_tiles(pipes, pos):
 			
 def get_start(pipes):
 	for y, row in enumerate(pipes):
-			for x, element in enumerate(row):
-				if element == "S":
-					return (x, y)
+		for x, element in enumerate(row):
+			if element == "S":
+				return (x, y)
 
 def get_start_symbol(pipes, start):
 	start_connections = {connection for connection in connected_tiles(pipes, start) if start in connected_tiles(pipes, connection)}
