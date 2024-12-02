@@ -10,7 +10,7 @@ def safe(report):
 def main():
 	reports = [list(map(int, row.split())) for row in sys.stdin]
 
-	num_safe = sum(safe(report) for report in reports)
+	num_safe = sum(any(safe(report[:i] + report[i + 1:]) for i in range(len(report))) for report in reports)
 
 	print(num_safe)
 
