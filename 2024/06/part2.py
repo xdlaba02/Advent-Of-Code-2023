@@ -1,7 +1,7 @@
 import sys
 
-def in_range(pos, max):
-	return pos[0] >= 0 and pos[0] <= max[0] and pos[1] >= 0 and pos[1] <= max[1]
+def in_range(pos, size):
+	return pos[0] >= 0 and pos[0] < size[0] and pos[1] >= 0 and pos[1] < size[1]
 
 
 def move(pos, dir):
@@ -12,55 +12,66 @@ def rotate(dir):
 	return (-dir[1], dir[0])
 
 
-def is_cycled(pos, dir, max, obstacles):
+def is_cycled(pos, dir, map):
+	size = (len(map[0]), len(map))
+
 	visited = set()
-	while in_range(pos, max):
+	while True:
 		if (pos, dir) in visited:
 			return True
 		
 		visited.add((pos, dir))
 
-		while move(pos, dir) in obstacles:
+		while True:
+			next_pos = move(pos, dir)
+			
+			if not in_range(next_pos, size):
+				return False
+
+			if map[next_pos[1]][next_pos[0]] != "#":
+				break
+
 			dir = rotate(dir)
-
-		pos = move(pos, dir)
-
-	return False
-
-
-def main():
-	obstacles = set()
-
-	for y, line in enumerate(sys.stdin):
-		max_y = y
-		for x, tile in enumerate(line.strip()):
-			max_x = x
-			if tile == "#":
-				obstacles.add((x, y))
-			elif tile == "^":
-				pos = (x, y)
-
-	result = 0
-
-	dir = (0, -1)
-
-	visited = set()
-	while in_range(pos, (max_x, max_y)):		
-		visited.add(pos)
-
-		while move(pos, dir) in obstacles:
-			dir = rotate(dir)
-
-		next_pos = move(pos, dir)
-
-		if next_pos not in visited:
-			obstacles.add(next_pos)
-			result += is_cycled(pos, dir, (max_x, max_y), obstacles)
-			obstacles.remove(next_pos)
 
 		pos = next_pos
 
-	print(result)
+def get_start(map):
+	for y in range(len(map)):
+		for x in range(len(map[y])):
+			if map[y][x] == "^":
+				return (x, y)
+
+def main():
+	map = [list(line.strip()) for line in sys.stdin]
+
+	size = (len(map[0]), len(map))
+
+	result = 0
+
+	pos = get_start(map)
+	dir = (0, -1)
+
+	while True:
+		map[pos[1]][pos[0]] = "+"
+
+		while True:
+			next_pos = move(pos, dir)
+
+			if not in_range(next_pos, size):
+				print(result)
+				return
+
+			if map[next_pos[1]][next_pos[0]] != "#":
+				break
+
+			dir = rotate(dir)
+
+		if map[next_pos[1]][next_pos[0]] != "+":
+			map[next_pos[1]][next_pos[0]] = "#"
+			result += is_cycled(pos, dir, map)
+
+		pos = next_pos
+
 
 
 if __name__ == "__main__":
