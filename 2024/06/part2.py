@@ -12,9 +12,7 @@ def rotate(dir):
 	return (-dir[1], dir[0])
 
 
-def is_cycled(pos, max, obstacles):
-	dir = (0, -1)
-
+def is_cycled(pos, dir, max, obstacles):
 	visited = set()
 	while in_range(pos, max):
 		if (pos, dir) in visited:
@@ -40,11 +38,10 @@ def main():
 			if tile == "#":
 				obstacles.add((x, y))
 			elif tile == "^":
-				starting_pos = (x, y)
+				pos = (x, y)
 
 	result = 0
 
-	pos = starting_pos
 	dir = (0, -1)
 
 	visited = set()
@@ -54,10 +51,14 @@ def main():
 		while move(pos, dir) in obstacles:
 			dir = rotate(dir)
 
-		if move(pos, dir) not in visited:
-			result += is_cycled(starting_pos, (max_x, max_y), obstacles.union({move(pos, dir)}))
+		next_pos = move(pos, dir)
 
-		pos = move(pos, dir)
+		if next_pos not in visited:
+			obstacles.add(next_pos)
+			result += is_cycled(pos, dir, (max_x, max_y), obstacles)
+			obstacles.remove(next_pos)
+
+		pos = next_pos
 
 	print(result)
 
