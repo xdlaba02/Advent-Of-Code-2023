@@ -21,18 +21,16 @@ def main():
 	while positions:
 		cost, pos = heapq.heappop(positions)
 
-		if cost >= costs.get(pos, float('inf')):
+		if pos in bytes or not inside(pos) or cost >= costs.get(pos, float('inf')):
 			continue
 
 		costs[pos] = cost
 
+		if pos == end:
+			break
+
 		for dir in ((1, 0), (0, 1), (-1, 0), (0, -1)):
-			new_pos = add_tuples(pos, dir)
-
-			if new_pos in bytes or not inside(new_pos):
-				continue
-
-			heapq.heappush(positions, (cost + 1, new_pos))
+			heapq.heappush(positions, (cost + 1, add_tuples(pos, dir)))
 		
 	result = costs[end]
 

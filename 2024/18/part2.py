@@ -1,5 +1,4 @@
 import sys
-import heapq
 
 
 def add_tuples(a, b):
@@ -14,29 +13,27 @@ def path_exists(bytes):
 	start = (0, 0)
 	end = (70, 70)
 
-	positions = []
+	positions = [start]
 	costs = {}
 
-	heapq.heappush(positions, (0, start))
-
 	while positions:
-		cost, pos = heapq.heappop(positions)
+		pos = positions.pop()
 
 		if pos == end:
 			return True
+
+		if pos in bytes or not inside(pos):
+			continue
+		
+		cost = abs(end[0] - pos[0]) + abs(end[1] - pos[1])
 
 		if cost >= costs.get(pos, float('inf')):
 			continue
 
 		costs[pos] = cost
 
-		for dir in ((1, 0), (0, 1), (-1, 0), (0, -1)):
-			new_pos = add_tuples(pos, dir)
-
-			if new_pos in bytes or not inside(new_pos):
-				continue
-
-			heapq.heappush(positions, (cost + 1, new_pos))
+		for dir in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
+			positions.append(add_tuples(pos, dir))
 		
 	return False
 
